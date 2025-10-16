@@ -1,0 +1,57 @@
+# Build results
+bin/
+obj/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider files
+.idea/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Dotnet publish folder
+publish/
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+
+# Resharper
+_ReSharper*/
+
+# User-specific files
+*.rsuser
+*.dotCover
+
+# Test results
+TestResults/
+
+# Azure Pipelines
+.vscode/
+
+# Others
+*.pdb
+*.cache
+*.ilk
+*.meta
+*.obj
+*.exe
+*.dll
+*.log
+
+# Source Link
+*.sourcelink.json
+
+# Docker files
+docker-compose.override.yml
