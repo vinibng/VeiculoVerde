@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de Impacto Ambiental</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Análise de Impacto Ambiental por Região</h1>
+        <form id="analiseForm">
+            <p><strong>Calcular Impacto em uma Região Específica:</strong></p>
+            <div>
+                <label for="cepAnalise">CEP (opcional):</label>
+                <input type="text" id="cepAnalise" name="cep" maxlength="8" placeholder="Ex: 01000000">
+            </div>
+            <div>
+                <label for="cidadeAnalise">Cidade (opcional):</label>
+                <input type="text" id="cidadeAnalise" name="cidade" placeholder="Ex: São Paulo">
+            </div>
+            <div>
+                <label for="estadoAnalise">Estado (UF, opcional):</label>
+                <input type="text" id="estadoAnalise" name="estado" maxlength="2" placeholder="Ex: SP">
+            </div>
+            <button type="submit">Calcular Impacto</button>
+        </form>
+
+        <div class="result-box" id="analiseResult"></div>
+        <div class="error-message" id="analiseError"></div>
+
+        <h2>Impactos Ambientais Registrados (Paginado)</h2>
+        <form id="listaAnaliseForm">
+            <p><strong>Filtrar e Listar Impactos Registrados:</strong></p>
+            <div class="form-row">
+                <div>
+                    <label for="pageNumberAnalise">Página:</label>
+                    <input type="number" id="pageNumberAnalise" name="pageNumber" value="1" min="1">
+                </div>
+                <div>
+                    <label for="pageSizeAnalise">Tamanho da Página:</label>
+                    <input type="number" id="pageSizeAnalise" name="pageSize" value="10" min="1">
+                </div>
+            </div>
+            <div>
+                <label for="cepLista">CEP (filtro opcional):</label>
+                <input type="text" id="cepLista" name="cep" maxlength="8" placeholder="Ex: 01000000">
+            </div>
+            <div>
+                <label for="cidadeLista">Cidade (filtro opcional):</label>
+                <input type="text" id="cidadeLista" name="cidade" placeholder="Ex: São Paulo">
+            </div>
+            <div>
+                <label for="estadoLista">Estado (filtro opcional):</label>
+                <input type="text" id="estadoLista" name="estado" maxlength="2" placeholder="Ex: SP">
+            </div>
+            <button type="submit">Listar Impactos</button>
+        </form>
+        <div class="result-box" id="listaAnaliseResult"></div>
+        <div class="error-message" id="listaAnaliseError"></div>
+
+        <p><a href="index.html">Voltar ao Dashboard</a></p>
+    </div>
+
+    <script>
+        document.getElementById('analiseForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const cep = document.getElementById('cepAnalise').value;
+            const cidade = document.getElementById('cidadeAnalise').value;
+            const estado = document.getElementById('estadoAnalise').value;
+
+            const queryParams = new URLSearchParams();
+            if (cep) queryParams.append('cep', cep);
+            if (cidade) queryParams.append('cidade', cidade);
+            if (estado) queryParams.append('estado', estado);
+
+            try {
+                const response = await fetch(`/api/AnaliseImpacto/por-regiao?${queryParams.toString()}`);
+                const resultBox = document.getElementById('analiseResult');
+                const errorBox = document.getElementById('analiseError');
+                errorBox.textContent = '';
+
+                if (response.ok) {
+                    const result = await response.json();
+                    let formattedResult = '<h3>Resultado da Análise de Impacto:</h3>';
+                    if (result.totalSubstituicoes !== undefined) {
+                        formattedResult += `<p><strong>Total de Substituições Registradas:</strong> ${result.totalSubstituicoes}</p>`;
+                    }
+                    if (result.reducaoCO2Total !== undefined) {
+                        formattedResult += `<p><strong>Redução Total de CO2 Estimada:</strong> ${result.reducaoCO2Total.toFixed(2).replace('.', ',')} kg</p>`;
+                    }
+                    if (result.economiaCombustivelTotal !== undefined) {
+                        formattedResult += `<p><strong>Economia Total de Combustível Estimada:</strong> ${result.economiaCombustivelTotal.toFixed(2).replace('.', ',')} litros</p>`;
+                    }
+                    if (result.cidade) {
+                        formattedResult += `<p><strong>Cidade:</strong> ${result.cidade}</p>`;
+                    }
+                    if (result.estado) {
+                        formattedResult += `<p><strong>Estado:</strong> ${result.estado}</p>`;
+                    }
+                    if (result.cep) {
+                        formattedResult += `<p><strong>CEP:</strong> ${result.cep}</p>`;
+                    }
+     
+                    resultBox.innerHTML = formattedResult;
+                } else {
+                    const error = await response.json();
+                    errorBox.textContent = `Erro ${response.status}: ${response.statusText}\n` + (error.detail || JSON.stringify(error));
+                    resultBox.innerHTML = '';
+                }
+            } catch (error) {
+                document.getElementById('analiseError').textContent = 'Erro de rede: ' + error.message;
+                document.getElementById('analiseResult').innerHTML = '';
+            }
+        });
+
+        document.getElementById('listaAnaliseForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const pageNumber = document.getElementById('pageNumberAnalise').value;
+            const pageSize = document.getElementById('pageSizeAnalise').value;
+            const cep = document.getElementById('cepLista').value;
+            const cidade = document.getElementById('cidadeLista').value;
+            const estado = document.getElementById('estadoLista').value;
+
+            const queryParams = new URLSearchParams();
+            queryParams.append('pageNumber', pageNumber);
+            queryParams.append('pageSize', pageSize);
+            if (cep) queryParams.append('cep', cep);
+            if (cidade) queryParams.append('cidade', cidade);
+            if (estado) queryParams.append('estado', estado);
+
+            try {
+                const response = await fetch(`/api/AnaliseImpacto/lista-paginada?${queryParams.toString()}`);
+                const resultBox = document.getElementById('listaAnaliseResult');
+                const errorBox = document.getElementById('listaAnaliseError');
+                errorBox.textContent = '';
+
+                if (response.ok) {
+                    const result = await response.json();
+
+                    resultBox.innerHTML = '';
+
+                    if (result.items && result.items.length > 0) {
+                        const heading = document.createElement('h3');
+                        heading.textContent = `Impactos Ambientais Registrados (${result.totalCount} no total):`;
+                        resultBox.appendChild(heading);
+
+                        result.items.forEach(item => {
+                            const itemDiv = document.createElement('div');
+                            itemDiv.className = 'incentive-item';
+                            itemDiv.innerHTML = `
+                                    <h4>Substituição em ${item.cidade || 'N/A'}, ${item.estado || 'N/A'} (CEP: ${item.cep || 'N/A'})</h4>
+                                    <p><strong>Data:</strong> ${new Date(item.dataSubstituicao).toLocaleDateString('pt-BR')}</p>
+                                    <p><strong>Veículo Original:</strong> ${item.marcaVeiculoCombustao || 'N/A'} ${item.modeloVeiculoCombustao || 'N/A'} (${item.anoFabricacaoVeiculoCombustao || 'N/A'}) - Placa: ${item.placaVeiculoCombustao || 'N/A'}</p>
+                                    <p><strong>Veículo Substituto:</strong> ${item.tipoVeiculoSubstituto ? item.tipoVeiculoSubstituto.replace(/([A-Z])/g, ' $1').trim() : 'N/A'} - ${item.marcaVeiculoSubstituto || 'N/A'} ${item.modeloVeiculoSubstituto || 'N/A'}</p>
+                                    <p><strong>Redução Estimada de CO2:</strong> ${item.reducaoCO2Estimada ? item.reducaoCO2Estimada.toFixed(2).replace('.', ',') : '0,00'} kg</p>
+                                    <p><strong>Economia Estimada de Combustível:</strong> ${item.economiaCombustivelEstimada ? item.economiaCombustivelEstimada.toFixed(2).replace('.', ',') : '0,00'} litros</p>
+                                `;
+                            resultBox.appendChild(itemDiv);
+                        });
+                        
+                    } else {
+                        resultBox.textContent = 'Nenhum impacto ambiental encontrado para os filtros selecionados.';
+                    }
+                } else {
+                    const error = await response.json();
+                    errorBox.textContent = `Erro ${response.status}: ${response.statusText}\n` + (error.detail || JSON.stringify(error));
+                    resultBox.innerHTML = '';
+                }
+            } catch (error) {
+                document.getElementById('listaAnaliseError').textContent = 'Erro de rede: ' + error.message;
+                document.getElementById('listaAnaliseResult').innerHTML = '';
+            }
+        });
+    </script>
+</body>
+</html>

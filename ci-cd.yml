@@ -1,0 +1,66 @@
+name: CI/CD - VeiculoVerde ESGInteligentes
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: veiculoverde-api
+  PROJECT_PATH: VeiculoVerde.Api/VeiculoVerde.Api.csproj
+  DOCKER_REGISTRY: ghcr.io/${{ github.repository_owner }}
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Código
+      uses: actions/checkout@v4
+
+    - name: Configurar .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x' 
+
+    - name: Restaurar dependências
+      run: dotnet restore ${{ env.PROJECT_PATH }} 
+
+    - name: Build da Aplicação em Release
+      run: dotnet build ${{ env.PROJECT_PATH }} --no-restore --configuration Release
+    
+    - name: Rodar Testes Automatizados (Simulação)
+      run: |
+        echo "::notice::Execução simulada de testes: dotnet test VeiculoVerde.Tests/"
+
+    - name: Login no GitHub Container Registry (GHCR)
+      if: github.event_name == 'push'
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.DOCKER_REGISTRY }}
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build e Push da Imagem Docker
+      if: github.event_name == 'push'
+      uses: docker/build-push-action@v5
+      with:
+        context: ./VeiculoVerde.Api
+        push: true
+        tags: |
+          ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+        file: Dockerfile
+
+  deploy_staging:
+    needs: build_and_test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: Staging
+    steps:
+    - name: Deploy Staging (Simulação)
+      run: |
+        echo "Simulação de deploy da imagem ${{ github.sha }} para o ambiente Staging."

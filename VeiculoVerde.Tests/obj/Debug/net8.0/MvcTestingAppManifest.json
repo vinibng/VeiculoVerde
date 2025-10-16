@@ -1,0 +1,6 @@
+{
+  "VeiculoVerde.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Users\\vinicius\\source\\repos\\VeiculoVerde\\VeiculoVerde.Api",
+  "VeiculoVerde.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Users\\vinicius\\source\\repos\\VeiculoVerde\\VeiculoVerde.Application",
+  "VeiculoVerde.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Users\\vinicius\\source\\repos\\VeiculoVerde\\VeiculoVerde.Domain",
+  "VeiculoVerde.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Users\\vinicius\\source\\repos\\VeiculoVerde\\VeiculoVerde.Infrastructure"
+}

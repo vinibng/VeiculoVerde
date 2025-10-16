@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeção de Substituições</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Projeção de Substituições Futuras</h1>
+        <form id="projecaoForm">
+            <div>
+                <label for="anosParaFrente">Anos para Frente:</label>
+                <input type="number" id="anosParaFrente" name="anosParaFrente" value="5" min="1" required>
+            </div>
+            <button type="submit">Gerar Projeção</button>
+        </form>
+
+        <div class="result-box" id="projecaoResult"></div>
+        <div class="error-message" id="projecaoError"></div>
+
+        <p><a href="index.html">Voltar ao Dashboard</a></p>
+    </div>
+
+    <script>
+        document.getElementById('projecaoForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const anosParaFrente = document.getElementById('anosParaFrente').value;
+
+            try {
+                const response = await fetch(`/api/Projecao/${anosParaFrente}`);
+                const resultBox = document.getElementById('projecaoResult');
+                const errorBox = document.getElementById('projecaoError');
+                errorBox.textContent = '';
+
+                if (response.ok) {
+                    const result = await response.json();
+                    resultBox.innerHTML = '';
+
+                    if (result) {
+                        let formattedResult = '<h3>Resultado da Projeção de Substituições:</h3>';
+                        formattedResult += `<p><strong>Número de Anos Projetados:</strong> ${result.anosProjetados || anosParaFrente}</p>`;
+                        formattedResult += `<p><strong>Total de Substituições Projetadas:</strong> ${result.totalSubstituicoesProjetadas || 0}</p>`;
+                        formattedResult += `<p><strong>Redução Total de CO2 Projetada:</strong> ${result.reducaoCO2TotalProjetada ? result.reducaoCO2TotalProjetada.toFixed(2).replace('.', ',') : '0,00'} kg</p>`;
+                        formattedResult += `<p><strong>Economia Total de Combustível Projetada:</strong> ${result.economiaCombustivelTotalProjetada ? result.economiaCombustivelTotalProjetada.toFixed(2).replace('.', ',') : '0,00'} litros</p>`;
+
+                        if (result.projecaoPorAno && result.projecaoPorAno.length > 0) {
+                            formattedResult += '<h4>Detalhes por Ano:</h4><ul>';
+                            result.projecaoPorAno.forEach(anoProjecao => {
+                                formattedResult += `<li><strong>Ano ${anoProjecao.ano}:</strong> ${anoProjecao.substituicoesProjetadas} substituições, Redução CO2: ${anoProjecao.reducaoCO2.toFixed(2).replace('.', ',')} kg, Economia Combustível: ${anoProjecao.economiaCombustivel.toFixed(2).replace('.', ',')} litros</li>`;
+                            });
+                            formattedResult += '</ul>';
+                        } else {
+                            formattedResult += '<p>Não há detalhes de projeção por ano disponíveis.</p>';
+                        }
+                        resultBox.innerHTML = formattedResult;
+
+                    } else {
+                        resultBox.textContent = 'Não foi possível gerar a projeção. Nenhum dado retornado.';
+                    }
+
+                } else {
+                    const error = await response.json();
+                    errorBox.textContent = `Erro ${response.status}: ${response.statusText}\n` + (error.detail || JSON.stringify(error));
+                    resultBox.innerHTML = '';
+                }
+            } catch (error) {
+                document.getElementById('projecaoError').textContent = 'Erro de rede: ' + error.message;
+                document.getElementById('projecaoResult').innerHTML = '';
+            }
+        });
+    </script>
+</body>
+</html>

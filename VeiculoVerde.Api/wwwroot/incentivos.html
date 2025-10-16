@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sugestão de Incentivos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Sugestão de Incentivos</h1>
+        <form id="incentivosForm">
+            <div>
+                <label for="tipoVeiculoSugestao">Tipo Veículo Substituto (opcional):</label>
+                <select id="tipoVeiculoSugestao" name="tipoVeiculoSubstituto">
+                    <option value="">Todos</option>
+                    <option value="CarroEletrico">Carro Elétrico</option>
+                    <option value="MotoEletrica">Moto Elétrica</option>
+                    <option value="BicicletaEletrica">Bicicleta Elétrica</option>
+                    <option value="BicicletaComum">Bicicleta Comum</option>
+                </select>
+            </div>
+            <div>
+                <label for="estadoSugestao">Estado (UF, opcional):</label>
+                <input type="text" id="estadoSugestao" name="estado" maxlength="2" placeholder="Ex: SP">
+            </div>
+            <button type="submit">Buscar Incentivos</button>
+        </form>
+
+        <div class="result-box" id="incentivosResult"></div>
+        <div class="error-message" id="incentivosError"></div>
+
+        <p><a href="index.html">Voltar ao Dashboard</a></p>
+    </div>
+
+    <script>
+        document.getElementById('incentivosForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const tipoVeiculoSubstituto = document.getElementById('tipoVeiculoSugestao').value;
+            const estado = document.getElementById('estadoSugestao').value;
+
+            const queryParams = new URLSearchParams();
+            if (tipoVeiculoSubstituto) queryParams.append('tipoVeiculoSubstituto', tipoVeiculoSubstituto);
+            if (estado) queryParams.append('estado', estado);
+
+            try {
+                const response = await fetch(`/api/Incentivos?${queryParams.toString()}`);
+                const resultBox = document.getElementById('incentivosResult');
+                const errorBox = document.getElementById('incentivosError');
+                errorBox.textContent = '';
+
+                if (response.ok) {
+                    const result = await response.json();
+
+                    resultBox.innerHTML = '';
+
+                    if (result.length > 0) {
+                        const heading = document.createElement('h2');
+                        heading.textContent = 'Incentivos Sugeridos:';
+                        resultBox.appendChild(heading);
+
+                        result.forEach(incentivo => {
+                            const incentiveDiv = document.createElement('div');
+                            incentiveDiv.className = 'incentive-item'; 
+
+                            incentiveDiv.innerHTML = `
+                                    <h3>${incentivo.tipoIncentivo || 'N/A'}</h3>
+                                    <p><strong>Descrição:</strong> ${incentivo.descricao || 'N/A'}</p>
+                                    <p><strong>Elegibilidade:</strong> ${incentivo.elegibilidade || 'N/A'}</p>
+                                    <p><strong>Valor Estimado do Benefício:</strong> R$ ${incentivo.valorEstimadoBeneficio ? incentivo.valorEstimadoBeneficio.toFixed(2).replace('.', ',') : '0,00'}</p>
+                                    ${incentivo.linkMaisInformacoes ? `<p><a href="${incentivo.linkMaisInformacoes}" target="_blank">Mais Informações</a></p>` : ''}
+                                `;
+                            resultBox.appendChild(incentiveDiv);
+                        });
+                    } else {
+                        resultBox.textContent = 'Nenhum incentivo encontrado para os critérios selecionados.';
+                    }
+
+                } else {
+                    const error = await response.json();
+                    errorBox.textContent = `Erro ${response.status}: ${response.statusText}\n` + (error.detail || JSON.stringify(error));
+                    resultBox.innerHTML = '';
+                }
+            } catch (error) {
+                document.getElementById('incentivosError').textContent = 'Erro de rede ou ao processar a resposta: ' + error.message;
+                document.getElementById('incentivosResult').innerHTML = '';
+            }
+        });
+    </script>
+</body>
+</html>

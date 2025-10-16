@@ -1,0 +1,65 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36203.30
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VeiculoVerde.Api", "VeiculoVerde.Api\VeiculoVerde.Api.csproj", "{AAAD6295-EE4D-4363-A9F8-0570EA3F4972}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VeiculoVerde.Application", "VeiculoVerde.Application\VeiculoVerde.Application.csproj", "{FA0CF17D-708F-4B3C-A8A9-9FFD7D6EBF74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VeiculoVerde.Domain", "VeiculoVerde.Domain\VeiculoVerde.Domain.csproj", "{DA463731-7CB5-4A31-9F60-97306DC17F86}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VeiculoVerde.Infrastructure", "VeiculoVerde.Infrastructure\VeiculoVerde.Infrastructure.csproj", "{572C564A-1941-421B-B217-617EA44FBC8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VeiculoVerde.Tests", "VeiculoVerde.Tests\VeiculoVerde.Tests.csproj", "{7C94102A-0EC9-40B8-802B-7B784245E63E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens-de-Solução", "Itens-de-Solução", "{380A7511-A354-6D7A-0CC0-8FA1F1BA7B6C}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+		Dockerfile = Dockerfile
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github", "github", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{73F30509-96E7-45E2-AAC5-D8C245E79373}"
+	ProjectSection(SolutionItems) = preProject
+		ci-cd.yml = ci-cd.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AAAD6295-EE4D-4363-A9F8-0570EA3F4972}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAAD6295-EE4D-4363-A9F8-0570EA3F4972}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAAD6295-EE4D-4363-A9F8-0570EA3F4972}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAAD6295-EE4D-4363-A9F8-0570EA3F4972}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA0CF17D-708F-4B3C-A8A9-9FFD7D6EBF74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA0CF17D-708F-4B3C-A8A9-9FFD7D6EBF74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA0CF17D-708F-4B3C-A8A9-9FFD7D6EBF74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA0CF17D-708F-4B3C-A8A9-9FFD7D6EBF74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA463731-7CB5-4A31-9F60-97306DC17F86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA463731-7CB5-4A31-9F60-97306DC17F86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA463731-7CB5-4A31-9F60-97306DC17F86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA463731-7CB5-4A31-9F60-97306DC17F86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{572C564A-1941-421B-B217-617EA44FBC8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{572C564A-1941-421B-B217-617EA44FBC8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{572C564A-1941-421B-B217-617EA44FBC8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{572C564A-1941-421B-B217-617EA44FBC8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C94102A-0EC9-40B8-802B-7B784245E63E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C94102A-0EC9-40B8-802B-7B784245E63E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C94102A-0EC9-40B8-802B-7B784245E63E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C94102A-0EC9-40B8-802B-7B784245E63E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{73F30509-96E7-45E2-AAC5-D8C245E79373} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B7B1BD10-D688-4990-93D5-F55AEE2B869D}
+	EndGlobalSection
+EndGlobal
