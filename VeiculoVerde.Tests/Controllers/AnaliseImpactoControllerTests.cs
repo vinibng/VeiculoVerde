@@ -30,7 +30,9 @@ namespace VeiculoVerde.Tests.Controllers
             var cep = "01000000";
             var cidade = "São Paulo";
             var estado = "SP";
-            var impactoDto = new ImpactoAmbientalDTO
+
+            // CORREÇÃO AQUI: Criando o ResponseDTO que o Service espera retornar
+            var impactoResponseDto = new ImpactoAmbientalResponseDTO
             {
                 CEP = cep,
                 Cidade = cidade,
@@ -38,11 +40,13 @@ namespace VeiculoVerde.Tests.Controllers
                 ReducaoCO2TotalKg = 1000,
                 EconomiaCombustivelTotalLitros = 500,
                 NumeroSubstituicoes = 10,
-                DataAnalise = System.DateTime.Now
+                DataAnalise = System.DateTime.Now,
+                VeiculosSubstituidos = new List<VeiculoSubstituidoResponseDTO>() // Não é necessário popular para este teste
             };
 
+            // 1. Usando .ReturnsAsync (Sintaxe correta do Moq) com o tipo correto: ImpactoAmbientalResponseDTO
             _mockAnaliseImpactoService.Setup(s => s.CalcularImpactoAmbientalPorRegiaoAsync(cep, cidade, estado))
-                                      .ReturnsAsync(impactoDto);
+                                      .ReturnsAsync(impactoResponseDto);
 
             // Act
             var result = await _controller.GetImpactoPorRegiao(cep, cidade, estado);
@@ -50,7 +54,9 @@ namespace VeiculoVerde.Tests.Controllers
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.Equal((int)HttpStatusCode.OK, okResult.StatusCode);
-            var returnedValue = Assert.IsType<ImpactoAmbientalDTO>(okResult.Value);
+
+            // O Controller deve retornar o ResponseDTO, então o Assert.IsType deve ser para o ResponseDTO
+            var returnedValue = Assert.IsType<ImpactoAmbientalResponseDTO>(okResult.Value);
             Assert.Equal(cep, returnedValue.CEP);
         }
 
@@ -59,8 +65,10 @@ namespace VeiculoVerde.Tests.Controllers
         {
             // Arrange
             var cep = "99999999";
+
+            // 2. Usando .ReturnsAsync com retorno nulo e o tipo correto: ImpactoAmbientalResponseDTO
             _mockAnaliseImpactoService.Setup(s => s.CalcularImpactoAmbientalPorRegiaoAsync(cep, null, null))
-                                      .ReturnsAsync((ImpactoAmbientalDTO)null);
+                                      .ReturnsAsync((ImpactoAmbientalResponseDTO)null);
 
             // Act
             var result = await _controller.GetImpactoPorRegiao(cep, null, null);
@@ -77,6 +85,9 @@ namespace VeiculoVerde.Tests.Controllers
             // Arrange
             var pageNumber = 1;
             var pageSize = 10;
+
+            // ATENÇÃO: Se GetImpactosAmbientaisPaginatedAsync retorna PaginatedResultDTO<ImpactoAmbientalDTO>
+            // essa parte deve estar correta. MANTIDO.
             var mockItems = new List<ImpactoAmbientalDTO>
             {
                 new ImpactoAmbientalDTO { CEP = "01000000", Cidade = "São Paulo", Estado = "SP", ReducaoCO2TotalKg = 100 },
