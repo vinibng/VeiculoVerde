@@ -1,9 +1,9 @@
-﻿// VeiculoVerde.Api/Controllers/AnaliseImpactoController.cs
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using VeiculoVerde.Application.DTOs;
 using VeiculoVerde.Application.Interfaces;
 using System.Threading.Tasks;
 using System.Net;
+using System;
 
 namespace VeiculoVerde.Api.Controllers
 {
@@ -27,15 +27,33 @@ namespace VeiculoVerde.Api.Controllers
         /// <returns>O impacto ambiental agregado para a região.</returns>
         [HttpGet("por-regiao")]
         [ProducesResponseType(typeof(ImpactoAmbientalDTO), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)] // Adicionado para documentar o 500
         public async Task<IActionResult> GetImpactoPorRegiao([FromQuery] string? cep, [FromQuery] string? cidade, [FromQuery] string? estado)
         {
-            var impacto = await _analiseImpactoService.CalcularImpactoAmbientalPorRegiaoAsync(cep, cidade, estado);
-            if (impacto == null)
+            if (string.IsNullOrEmpty(cep) && string.IsNullOrEmpty(cidade) && string.IsNullOrEmpty(estado))
             {
-                return NotFound("Nenhum impacto encontrado para a região especificada.");
+                // Garante que o Bad Request seja JSON
+                return BadRequest(new { message = "É necessário fornecer ao menos CEP, Cidade ou Estado para a análise." });
             }
-            return Ok(impacto);
+
+            try
+            {
+                var impacto = await _analiseImpactoService.CalcularImpactoAmbientalPorRegiaoAsync(cep, cidade, estado);
+
+                if (impacto == null)
+                {
+                    // Garante que o NotFound seja JSON
+                    return NotFound(new { message = "Nenhum impacto encontrado para a região especificada." });
+                }
+                return Ok(impacto);
+            }
+            catch (Exception ex)
+            {
+                // Tratamento de erro 500, garantindo o retorno de JSON
+                return StatusCode((int)HttpStatusCode.InternalServerError, new { message = $"Ocorreu um erro interno ao buscar o impacto: {ex.Message}" });
+            }
         }
 
         /// <summary>
@@ -49,10 +67,19 @@ namespace VeiculoVerde.Api.Controllers
         /// <returns>Lista paginada de impactos ambientais.</returns>
         [HttpGet("lista-paginada")]
         [ProducesResponseType(typeof(PaginatedResultDTO<ImpactoAmbientalDTO>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetImpactosPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? cep = null, [FromQuery] string? cidade = null, [FromQuery] string? estado = null)
         {
-            var result = await _analiseImpactoService.GetImpactosAmbientaisPaginatedAsync(pageNumber, pageSize, cep, cidade, estado);
-            return Ok(result);
+            try
+            {
+                var result = await _analiseImpactoService.GetImpactosAmbientaisPaginatedAsync(pageNumber, pageSize, cep, cidade, estado);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                // Tratamento de erro 500, garantindo o retorno de JSON
+                return StatusCode((int)HttpStatusCode.InternalServerError, new { message = $"Ocorreu um erro interno ao listar os impactos: {ex.Message}" });
+            }
         }
     }
 }

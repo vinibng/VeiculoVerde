@@ -4,23 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Veículo Verde - Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <!-- Incluindo Tailwind CSS para estilização -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
+        }
+
+        .container {
+            max-width: 1100px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Dashboard Veículo Verde</h1>
-        <p>Explore as funcionalidades da API de registro e análise de impacto da substituição de veículos a combustão por elétricos ou bicicletas.</p>
+<body class="p-4 md:p-8">
 
-        <nav>
-            <a href="registro.html">Registrar Substituição</a>
-            <a href="analise.html">Análise de Impacto</a>
-            <a href="projecao.html">Projeção de Substituições</a>
-            <a href="incentivos.html">Sugestão de Incentivos</a>
-        </nav>
+    <div class="container mx-auto text-center">
+        <h1 class="text-4xl font-extrabold text-gray-800 mb-4">Veículo Verde</h1>
+        <p class="text-xl text-gray-600 mb-12">Painel de Controle e Impacto Ambiental</p>
 
-        <div class="result-box" id="generalResult">
-            Selecione uma opção acima para interagir com a API e ver os resultados.
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+            <!-- Card 1: Registro -->
+            <a href="registro.html" class="card block p-6 h-full border-b-4 border-green-500 hover:border-green-600">
+                <div class="text-4xl mb-3 text-green-500">🚗</div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">Registrar Substituição</h2>
+                <p class="text-gray-500 text-sm">Adicione um novo veículo substituído.</p>
+            </a>
+
+            <!-- Card 2: Análise de Impacto -->
+            <a href="analise.html" class="card block p-6 h-full border-b-4 border-blue-500 hover:border-blue-600">
+                <div class="text-4xl mb-3 text-blue-500">📊</div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">Análise de Impacto</h2>
+                <p class="text-gray-500 text-sm">Visualize o impacto ambiental por região.</p>
+            </a>
+
+            <!-- Card 3: Projeção -->
+            <a href="projecao.html" class="card block p-6 h-full border-b-4 border-yellow-500 hover:border-yellow-600">
+                <div class="text-4xl mb-3 text-yellow-500">📈</div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">Projeção Futura</h2>
+                <p class="text-gray-500 text-sm">Simule o impacto de substituições futuras.</p>
+            </a>
+
+            <!-- Card 4: Incentivos -->
+            <a href="incentivos.html" class="card block p-6 h-full border-b-4 border-red-500 hover:border-red-600">
+                <div class="text-4xl mb-3 text-red-500">🎁</div>
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">Incentivos Fiscais</h2>
+                <p class="text-gray-500 text-sm">Sugestão de incentivos por região/tipo.</p>
+            </a>
+        </div>
+
+        <div class="mt-16 pt-6 border-t border-gray-300 text-gray-500 text-sm">
+            <p>&copy; 2024 Projeto Veículo Verde.</p>
         </div>
     </div>
+
 </body>
 </html>

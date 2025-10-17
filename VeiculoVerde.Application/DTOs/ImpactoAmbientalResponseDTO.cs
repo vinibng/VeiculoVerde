@@ -1,20 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace VeiculoVerde.Application.DTOs
 {
-    public class ImpactoAmbientalDTO
+    // DTO utilizado para retornar o resultado da análise de impacto,
+    // incluindo a lista detalhada de veículos que contribuíram.
+    public class ImpactoAmbientalResponseDTO
     {
-        [Required]
-        [StringLength(8, MinimumLength = 8)]
+        // Campos Agregados de Impacto
         public string CEP { get; set; }
-
-        [Required]
-        [StringLength(100)]
         public string Cidade { get; set; }
-
-        [Required]
-        [StringLength(2, MinimumLength = 2)]
         public string Estado { get; set; }
 
         [Range(0, double.MaxValue)]
@@ -28,5 +24,10 @@ namespace VeiculoVerde.Application.DTOs
 
         [Required]
         public DateTime DataAnalise { get; set; }
+
+        // NOVO CAMPO: Lista de veículos que contribuíram para este impacto.
+        // Usamos o DTO de Resposta do Veículo que criamos anteriormente (VeiculoSubstituidoResponseDTO).
+        public IEnumerable<VeiculoSubstituidoResponseDTO> VeiculosSubstituidos { get; set; } = new List<VeiculoSubstituidoResponseDTO>();
     }
 }
+

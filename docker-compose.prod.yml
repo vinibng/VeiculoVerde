@@ -1,0 +1,45 @@
+﻿version: '3.8'
+
+services:
+  veiculoverde-api:
+    image: ghcr.io/SEU_USUARIO/veiculoverde-api:production # Tag Production
+    container_name: veiculoverde-prod-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    # Configurações de produção (ex: logs, recursos)
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production # Use o perfil de ambiente Production
+      # A string de conexão de produção deve apontar para o banco de dados de produção
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=esg_cidades_prod;Username=esguser;Password=esgpassword
+      - ASPNETCORE_URLS=http://+:8080
+    networks:
+      - esg_network
+
+  db:
+    image: postgres:14-alpine
+    container_name: veiculoverde-prod-db
+    restart: always
+    environment:
+      - POSTGRES_USER=esguser
+      - POSTGRES_PASSWORD=esgpassword
+      - POSTGRES_DB=esg_cidades_prod
+    # Volume de dados críticos
+    volumes:
+      - esg_db_data_prod:/var/lib/postgresql/data/
+    networks:
+      - esg_network
+      
+networks:
+  esg_network:
+    driver: bridge
+
+volumes:
+  esg_db_data_prod:
+    driver: local

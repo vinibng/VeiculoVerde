@@ -1,6 +1,8 @@
-ï»¿// <copyright file="IImpactoAmbientalRepository.cs" company="PlaceholderCompany">
+.cs
+// <copyright file="IImpactoAmbientalRepository.cs" company="PlaceholderCompany">
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
+
 namespace VeiculoVerde.Domain.Interfaces
 {
     using System;
@@ -10,49 +12,49 @@ namespace VeiculoVerde.Domain.Interfaces
     using VeiculoVerde.Domain.Entities;
 
     /// <summary>
-    /// Interface para operaÃ§Ãµes de acesso a dados relacionadas ao impacto ambiental.
+    /// Interface para operações de acesso a dados relacionadas ao impacto ambiental.
     /// </summary>
     public interface IImpactoAmbientalRepository
     {
         /// <summary>
-        /// ObtÃ©m um registro de impacto ambiental pelo identificador.
+        /// Obtém um registro de impacto ambiental pelo identificador.
         /// </summary>
         /// <param name="id">Identificador do impacto ambiental.</param>
         /// <returns>O registro de impacto ambiental correspondente.</returns>
         Task<ImpactoAmbiental> GetByIdAsync(int id);
 
         /// <summary>
-        /// ObtÃ©m todos os registros de impacto ambiental.
+        /// Obtém todos os registros de impacto ambiental.
         /// </summary>
-        /// <returns>Uma coleÃ§Ã£o de registros de impacto ambiental.</returns>
+        /// <returns>Uma coleção de registros de impacto ambiental.</returns>
         Task<IEnumerable<ImpactoAmbiental>> GetAllAsync();
 
         /// <summary>
         /// Adiciona um novo registro de impacto ambiental.
         /// </summary>
         /// <param name="entity">Entidade de impacto ambiental a ser adicionada.</param>
-        /// <returns>Uma tarefa que representa a operaÃ§Ã£o assÃ­ncrona.</returns>
+        /// <returns>Uma tarefa que representa a operação assíncrona.</returns>
         Task AddAsync(ImpactoAmbiental entity);
 
         /// <summary>
         /// Atualiza um registro de impacto ambiental existente.
         /// </summary>
         /// <param name="entity">Entidade de impacto ambiental a ser atualizada.</param>
-        /// <returns>Uma tarefa que representa a operaÃ§Ã£o assÃ­ncrona.</returns>
+        /// <returns>Uma tarefa que representa a operação assíncrona.</returns>
         Task UpdateAsync(ImpactoAmbiental entity);
 
         /// <summary>
         /// Exclui um registro de impacto ambiental pelo identificador.
         /// </summary>
-        /// <param name="id">Identificador do impacto ambiental a ser excluÃ­do.</param>
-        /// <returns>Uma tarefa que representa a operaÃ§Ã£o assÃ­ncrona.</returns>
+        /// <param name="id">Identificador do impacto ambiental a ser excluído.</param>
+        /// <returns>Uma tarefa que representa a operação assíncrona.</returns>
         Task DeleteAsync(int id);
 
         /// <summary>
         /// Busca registros de impacto ambiental que atendam ao predicado informado.
         /// </summary>
-        /// <param name="predicate">ExpressÃ£o de filtro para busca.</param>
-        /// <returns>Uma coleÃ§Ã£o de registros de impacto ambiental filtrados.</returns>
+        /// <param name="predicate">Expressão de filtro para busca.</param>
+        /// <returns>Uma coleção de registros de impacto ambiental filtrados.</returns>
         Task<IEnumerable<ImpactoAmbiental>> FindAsync(Expression<Func<ImpactoAmbiental, bool>> predicate);
     }
 }

@@ -1,0 +1,38 @@
+﻿version: '3.8'
+
+services:
+  veiculoverde-api:
+    image: ghcr.io/SEU_USUARIO/veiculoverde-api:staging # Tag Staging
+    container_name: veiculoverde-staging-api
+    ports:
+      - "8081:8080" # Porta diferente para evitar conflito com produção ou local
+    depends_on:
+      - db
+    environment:
+      # Use o perfil de ambiente Staging (se aplicável no C#)
+      - ASPNETCORE_ENVIRONMENT=Staging 
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=esg_cidades_staging;Username=esguser;Password=esgpassword
+      - ASPNETCORE_URLS=http://+:8080
+    networks:
+      - esg_network
+
+  db:
+    image: postgres:14-alpine
+    container_name: veiculoverde-staging-db
+    restart: always
+    environment:
+      - POSTGRES_USER=esguser
+      - POSTGRES_PASSWORD=esgpassword
+      - POSTGRES_DB=esg_cidades_staging
+    volumes:
+      - esg_db_data_staging:/var/lib/postgresql/data/
+    networks:
+      - esg_network
+      
+networks:
+  esg_network:
+    driver: bridge
+
+volumes:
+  esg_db_data_staging:
+    driver: local

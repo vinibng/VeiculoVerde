@@ -3,182 +3,532 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrar Substituição</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Monitoramento de Impacto Ambiental</title>
+    <!-- Carrega Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Define a fonte Inter e configura o Tailwind para usar a cor primária -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#10B981', /* Verde para o tema ambiental */
+                        'primary-dark': '#059669',
+                        'blue': {
+                            500: '#3B82F6',
+                            100: '#DBEAFE',
+                        },
+                        'green': {
+                            500: '#10B981',
+                            200: '#D1FAE5',
+                            100: '#E6F8F3'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        body {
+            background-color: #F8F8F8;
+            min-height: 100vh;
+        }
+
+        .registro-card {
+            transition: all 0.3s ease;
+        }
+
+            .registro-card:hover {
+                box-shadow: 0 6px 10px -3px rgba(0, 0, 0, 0.1), 0 3px 6px -3px rgba(0, 0, 0, 0.08);
+                transform: translateY(-2px);
+            }
+
+        .shadow-primary {
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1), 0 4px 6px -4px rgba(16, 185, 129, 0.05);
+        }
+
+        .input-field {
+            padding: 0.75rem; /* p-3 */
+            border: 1px solid #D1D5DB; /* border-gray-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            transition-duration: 150ms;
+            font-size: 0.875rem; /* text-sm */
+        }
+
+            .input-field:focus {
+                --tw-ring-color: #10B981;
+                --tw-border-opacity: 1;
+                border-color: #10B981;
+                box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); /* focus:ring-primary */
+            }
+
+        /* Classe utilitária para centralizar mensagens de erro da API (Bug 1) */
+        .api-error {
+            background-color: #FEE2E2;
+            color: #B91C1C;
+            border: 1px solid #FCA5A5;
+            text-align: center;
+        }
+
+        /* Oculta as views que não estão ativas */
+        .view {
+            display: none;
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Registrar Substituição de Veículo</h1>
-        <form id="registroForm">
-            <h2>Dados do Veículo a Combustão:</h2>
-            <div>
-                <label for="placaAntiga">Placa Veículo Combustão:</label>
-                <input type="text" id="placaAntiga" name="placaVeiculoCombustao" required maxlength="10" placeholder="Ex: ABC1234">
-            </div>
-            <div>
-                <label for="marcaAntiga">Marca Veículo Combustão:</label>
-                <input type="text" id="marcaAntiga" name="marcaVeiculoCombustao" required placeholder="Ex: Fiat">
-            </div>
-            <div>
-                <label for="modeloAntigo">Modelo Veículo Combustão:</label>
-                <input type="text" id="modeloAntigo" name="modeloVeiculoCombustao" required placeholder="Ex: Palio">
-            </div>
-            <div>
-                <label for="anoAntigo">Ano Fabricação Veículo Combustão:</label>
-                <input type="number" id="anoAntigo" name="anoFabricacaoVeiculoCombustao" required min="1900" max="2025" placeholder="Ex: 2010">
-            </div>
-            <div>
-                <label for="emissaoCO2Antiga">Emissão CO2 Anterior (kg/km):</label>
-                <input type="number" step="0.01" id="emissaoCO2Antiga" name="emissaoCO2Anterior" required min="0" placeholder="Ex: 0.15">
-            </div>
-            <div>
-                <label for="consumoCombustivelAntigo">Consumo Combustível Anterior (km/l):</label>
-                <input type="number" step="0.01" id="consumoCombustivelAntigo" name="consumoCombustivelAnteriorKmPorLitro" required min="0" placeholder="Ex: 12.5">
+<body class="font-sans">
+
+    <!-- Container Principal -->
+    <div id="app" class="max-w-3xl mx-auto p-4 md:p-8">
+
+        <!-- ============================================== -->
+        <!-- VIEW 1: REGISTRO E LISTAGEM (TELA INICIAL) -->
+        <!-- ============================================== -->
+        <div id="register-view" class="view">
+            <!-- Cabeçalho -->
+            <header class="text-center mb-8">
+                <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Registro de Impacto Ambiental</h1>
+                <p class="text-sm text-gray-500">Conectado à API em <span class="font-bold text-primary-dark">http://localhost:8080</span></p>
+            </header>
+
+            <!-- Formulário de Adição de Registro -->
+            <div class="bg-white p-6 rounded-xl shadow-primary mb-8">
+                <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Novo Registro de Impacto</h2>
+                <form id="registro-form" class="space-y-4">
+
+                    <!-- Campos de Localização -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="input-cep" class="block text-xs font-medium text-gray-600 mb-1">CEP</label>
+                            <input type="text" id="input-cep" class="input-field w-full" placeholder="Ex: 01001-000">
+                        </div>
+                        <div>
+                            <label for="input-cidade" class="block text-xs font-medium text-gray-600 mb-1">Cidade</label>
+                            <input type="text" id="input-cidade" class="input-field w-full" placeholder="Ex: São Paulo">
+                        </div>
+                        <div>
+                            <label for="input-estado" class="block text-xs font-medium text-gray-600 mb-1">Estado</label>
+                            <input type="text" id="input-estado" class="input-field w-full" placeholder="Ex: SP">
+                        </div>
+                    </div>
+
+                    <!-- Campos de Métrica -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="input-co2" class="block text-xs font-medium text-gray-600 mb-1">Redução CO2 (Kg)</label>
+                            <input type="number" step="0.01" id="input-co2" class="input-field w-full" placeholder="Ex: 50.50">
+                        </div>
+                        <div>
+                            <label for="input-combustivel" class="block text-xs font-medium text-gray-600 mb-1">Economia Combustível (Litros)</label>
+                            <input type="number" step="0.01" id="input-combustivel" class="input-field w-full" placeholder="Ex: 120.00">
+                        </div>
+                        <div>
+                            <label for="input-substituicoes" class="block text-xs font-medium text-gray-600 mb-1">Nº de Substituições</label>
+                            <input type="number" step="1" id="input-substituicoes" class="input-field w-full" placeholder="Ex: 3">
+                        </div>
+                    </div>
+
+                    <!-- Botão de Registrar -->
+                    <button type="submit"
+                            id="add-registro-btn"
+                            class="w-full bg-primary text-white p-3 rounded-lg font-semibold hover:bg-primary-dark transition duration-150 shadow-md whitespace-nowrap">
+                        Registrar Impacto
+                    </button>
+
+                    <!-- Botão para simular o fluxo de Análise de Impacto Total -->
+                    <button type="button"
+                            id="analise-total-btn"
+                            onclick="changeView('analysis-view')"
+                            class="w-full bg-blue-500 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-150 shadow-md whitespace-nowrap mt-2">
+                        Simular Análise de Impacto Total
+                    </button>
+                </form>
             </div>
 
-            <h2>Dados do Veículo Substituto:</h2>
-            <div>
-                <label for="tipoSubstituto">Tipo Veículo Substituto:</label>
-                <select id="tipoSubstituto" name="tipoVeiculoSubstituto" required>
-                    <option value="0">Carro Elétrico</option>
-                    <option value="1">Moto Elétrica</option>
-                    <option value="2">Bicicleta Elétrica</option>
-                    <option value="3">Bicicleta Comum</option>
-                </select>
-            </div>
-            <div>
-                <label for="marcaSubstituto">Marca Veículo Substituto:</label>
-                <input type="text" id="marcaSubstituto" name="marcaVeiculoSubstituto" required placeholder="Ex: Tesla">
-            </div>
-            <div>
-                <label for="modeloSubstituto">Modelo Veículo Substituto:</label>
-                <input type="text" id="modeloSubstituto" name="modeloVeiculoSubstituto" required placeholder="Ex: Model 3">
-            </div>
-            <div>
-                <label for="emissaoCO2Nova">Emissão CO2 Nova (kg/km):</label>
-                <input type="number" step="0.01" id="emissaoCO2Nova" name="emissaoCO2Nova" required min="0" placeholder="Ex: 0.01 (considerando energia renovável)">
-            </div>
-            <div>
-                <label for="autonomiaSubstituto">Autonomia Veículo Substituto (km):</label>
-                <input type="number" step="0.01" id="autonomiaSubstituto" name="autonomiaVeiculoSubstitutoKm" required min="0" placeholder="Ex: 400">
-            </div>
+            <!-- Lista de Registros -->
+            <main>
+                <h2 class="text-xl font-bold text-gray-700 mb-4">Análises de Impacto Recentes</h2>
+                <div id="registro-list" class="space-y-3">
+                    <!-- Os registros serão inseridos aqui via JavaScript -->
+                    <p id="loading-message" class="text-gray-500 text-center p-8 bg-white rounded-xl shadow-md">Conectando-se ao Backend...</p>
+                </div>
+            </main>
 
-            <h2>Localização e Data:</h2>
-            <div>
-                <label for="dataSubstituicao">Data da Substituição:</label>
-                <input type="date" id="dataSubstituicao" name="dataSubstituicao" required>
-            </div>
-            <div>
-                <label for="cep">CEP:</label>
-                <input type="text" id="cep" name="cep" required maxlength="8" placeholder="Ex: 01000000">
-            </div>
-            <div>
-                <label for="cidade">Cidade:</label>
-                <input type="text" id="cidade" name="cidade" required placeholder="Ex: São Paulo">
-            </div>
-            <div>
-                <label for="estado">Estado (UF):</label>
-                <input type="text" id="estado" name="estado" required maxlength="2" placeholder="Ex: SP">
-            </div>
-            <div>
-                <label for="pais">País:</label>
-                <input type="text" id="pais" name="pais" value="Brasil" readonly>
-            </div>
-            <button type="submit">Registrar Substituição</button>
-        </form>
+            <!-- Mensagem de Erro/Status -->
+            <div id="status-message" class="mt-6 p-4 rounded-lg text-center hidden"></div>
+        </div>
 
-        <div class="result-box" id="registroResult"></div>
-        <div class="error-message" id="registroError"></div>
-        <p><a href="index.html">Voltar ao Dashboard</a></p>
+
+        <!-- ============================================== -->
+        <!-- VIEW 2: ANÁLISE DE IMPACTO TOTAL (SIMULADA) -->
+        <!-- Implementa a correção do Bug 2 (Voltar ao Registro) -->
+        <!-- ============================================== -->
+        <div id="analysis-view" class="view">
+            <header class="text-center mb-10">
+                <h1 class="text-4xl font-extrabold text-gray-900 mb-2 md:text-5xl">
+                    Resultado da Análise de Impacto Total
+                </h1>
+                <p class="text-lg text-primary font-medium">Os dados abaixo são simulados e calculados fora da API.</p>
+            </header>
+
+            <div class="bg-white p-8 rounded-xl shadow-primary mb-8 border border-green-200 text-center">
+                <p class="text-3xl font-bold text-primary mb-4">Seu Impacto Acumulado</p>
+                <p class="text-gray-700 mb-6">Com base nas suas substituições registradas no último mês, você alcançou:</p>
+
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+                    <div class="bg-green-100 p-4 rounded-lg">
+                        <p class="text-4xl font-extrabold text-primary">45.2 kg</p>
+                        <p class="text-sm text-gray-600">CO2 Evitado</p>
+                    </div>
+                    <div class="bg-blue-100 p-4 rounded-lg">
+                        <p class="text-4xl font-extrabold text-blue-500">105.8 L</p>
+                        <p class="text-sm text-gray-600">Combustível Economizado</p>
+                    </div>
+                    <div class="bg-green-100 p-4 rounded-lg">
+                        <p class="text-4xl font-extrabold text-primary">15</p>
+                        <p class="text-sm text-gray-600">Viagens Alternativas</p>
+                    </div>
+                </div>
+
+                <!-- Botão de Correção do Bug 2: Levar à tela inicial/registro -->
+                <div class="mt-8">
+                    <button id="back-to-register-btn"
+                            class="w-full bg-gray-200 text-gray-800 p-3 rounded-lg font-bold
+                                    hover:bg-gray-300 transition duration-200"
+                            onclick="changeView('register-view')">
+                        Voltar ao Registro (Tela Inicial)
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
+    <!-- Script de Aplicação -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            document.getElementById('dataSubstituicao').value = `${year}-${month}-${day}`;
-        });
+        // --- CONFIGURAÇÃO DA API REAL ---
+        // Endereço base da sua API .NET Core, conforme configurado no docker-compose.yml
+        const API_BASE_URL = 'http://localhost:8080/api/ImpactoAmbiental';
 
-        document.getElementById('registroForm').addEventListener('submit', async function (event) {
-            event.preventDefault();
+        // --- REFERÊNCIAS DOM ---
+        const registroForm = document.getElementById('registro-form');
+        const registroList = document.getElementById('registro-list');
+        const loadingMessage = document.getElementById('loading-message');
+        const statusMessage = document.getElementById('status-message');
+        const addRegistroBtn = document.getElementById('add-registro-btn');
 
-            const form = event.target;
-            const formData = new FormData(form);
-            const data = {};
-            formData.forEach((value, key) => {
-                if (key === 'emissaoCO2Anterior' || key === 'consumoCombustivelAnteriorKmPorLitro' ||
-                    key === 'emissaoCO2Nova' || key === 'autonomiaVeiculoSubstitutoKm') {
-                    data[key] = parseFloat(value);
-                } else if (key === 'anoFabricacaoVeiculoCombustao' || key === 'tipoVeiculoSubstituto') {
-                    data[key] = parseInt(value);
-                } else {
-                    data[key] = value;
+        // Mapeamento dos inputs do formulário
+        const inputCEP = document.getElementById('input-cep');
+        const inputCidade = document.getElementById('input-cidade');
+        const inputEstado = document.getElementById('input-estado');
+        const inputCO2 = document.getElementById('input-co2');
+        const inputCombustivel = document.getElementById('input-combustivel');
+        const inputSubstituicoes = document.getElementById('input-substituicoes');
+
+        let registros = []; // Array local que armazena os dados recebidos da API
+
+        // --- LÓGICA DE NAVEGAÇÃO (Bug 2) ---
+
+        /**
+         * Alterna a visualização entre as diferentes telas do aplicativo.
+         * @param {string} viewId O ID da view a ser exibida (ex: 'register-view', 'analysis-view').
+         */
+        function changeView(viewId) {
+            document.querySelectorAll('.view').forEach(view => {
+                view.style.display = 'none';
+            });
+            const targetView = document.getElementById(viewId);
+            if (targetView) {
+                targetView.style.display = 'block';
+            }
+        }
+
+        // --- FUNÇÕES DE UTILIDADE E UI ---
+
+        /**
+         * Exibe uma mensagem de status temporária (incluindo o Bug 1).
+         */
+        function displayStatus(message, type = 'red') {
+            statusMessage.textContent = message;
+            statusMessage.classList.remove('hidden', 'bg-red-500', 'bg-green-500', 'bg-yellow-500', 'api-error');
+
+            // Tratamento do erro da API (Bug 1)
+            if (message.includes("Falha na conexão com a API") || type === 'red') {
+                statusMessage.classList.add('api-error');
+            } else if (type === 'green') {
+                statusMessage.classList.add('bg-green-500', 'text-white');
+            } else if (type === 'yellow') {
+                statusMessage.classList.add('bg-yellow-500', 'text-gray-800');
+            }
+
+            setTimeout(() => {
+                statusMessage.classList.add('hidden');
+            }, 5000); // 5 segundos para mensagens de API
+        }
+
+        /**
+         * Limpa os campos do formulário.
+         */
+        function clearForm() {
+            registroForm.reset();
+        }
+
+        // --- FUNÇÕES DE INTERAÇÃO COM A API (FETCH) ---
+
+        /**
+         * Realiza o GET /api/ImpactoAmbiental
+         * Inclui a correção do Bug 1, mostrando o erro de conexão.
+         */
+        async function fetchRegistros() {
+            loadingMessage.classList.remove('hidden');
+            try {
+                // Adiciona um timeout simulado para testar o erro de conexão (Bug 1)
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 segundos de timeout
+
+                const response = await fetch(API_BASE_URL, { signal: controller.signal });
+                clearTimeout(timeoutId); // Limpa o timeout se a resposta for rápida
+
+                if (!response.ok) {
+                    const errorDetails = await response.text();
+                    console.error("Erro ao buscar registros. Detalhes da resposta:", errorDetails);
+                    throw new Error(`HTTP error! Status: ${response.status}`);
                 }
+
+                return await response.json();
+
+            } catch (error) {
+                console.error("Fetch error:", error);
+
+                // --- CORREÇÃO DO BUG 1 ---
+                // Esta mensagem é crucial para o Bug 1, pois garante que o usuário saiba que a falha é externa.
+                displayStatus("Falha na conexão com a API. Verifique o Docker em http://localhost:8080.", 'red');
+                // Retorna um array vazio para renderizar a lista vazia sem travar a aplicação
+                return [];
+            } finally {
+                loadingMessage.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Realiza o POST /api/ImpactoAmbiental
+         */
+        async function addRegistroToDb(novoRegistro) {
+            const response = await fetch(API_BASE_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(novoRegistro)
             });
 
-            const cepInput = document.getElementById('cep');
-            if (cepInput.value && !/^\d{8}$/.test(cepInput.value)) {
-                document.getElementById('registroError').textContent = 'O CEP deve conter exatamente 8 dígitos numéricos.';
-                document.getElementById('registroResult').innerHTML = '';
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("Detalhes do erro POST:", errorText);
+                let message = `Falha ao registrar impacto. Status: ${response.status}.`;
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    if (errorJson.title) { message += ` ${errorJson.title}`; }
+                    else if (errorJson.errors) {
+                        message += " Erros de validação: " + Object.values(errorJson.errors).flat().join(", ");
+                    }
+                } catch (e) {
+                    message += ` Detalhes: ${errorText.substring(0, 100)}...`;
+                }
+                throw new Error(message);
+            }
+
+            return response.json();
+        }
+
+        /**
+         * Realiza o DELETE /api/ImpactoAmbiental/{id}
+         */
+        async function deleteRegistroFromDb(id) {
+            const response = await fetch(`${API_BASE_URL}/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("Detalhes do erro DELETE:", errorText);
+                throw new Error(`Falha ao deletar registro. Status: ${response.status}.`);
+            }
+            return true;
+        }
+
+        // --- FUNÇÕES CRUD (INTERAÇÃO COM API) ---
+
+        /**
+         * Adiciona um novo registro à API.
+         */
+        async function addRegistro(e) {
+            e.preventDefault();
+
+            // Captura e validação básica dos campos
+            const cep = inputCEP.value.trim();
+            const cidade = inputCidade.value.trim();
+            const estado = inputEstado.value.trim();
+            const reducaoCO2 = parseFloat(inputCO2.value);
+            const economiaCombustivel = parseFloat(inputCombustivel.value);
+            const numeroSubstituicoes = parseInt(inputSubstituicoes.value, 10);
+
+            if (!cep || !cidade || !estado || isNaN(reducaoCO2) || isNaN(economiaCombustivel) || isNaN(numeroSubstituicoes)) {
+                displayStatus("Por favor, preencha todos os campos corretamente.", 'yellow');
+                return;
+            }
+            if (reducaoCO2 < 0 || economiaCombustivel < 0 || numeroSubstituicoes < 0) {
+                displayStatus("As métricas não podem ser negativas.", 'yellow');
                 return;
             }
 
-            const estadoInput = document.getElementById('estado');
-            if (estadoInput.value && !/^[A-Z]{2}$/.test(estadoInput.value.toUpperCase())) {
-                document.getElementById('registroError').textContent = 'O Estado deve ser uma sigla de 2 letras (ex: SP).';
-                document.getElementById('registroResult').innerHTML = '';
-                return;
-            }
-
+            // Criação do objeto com nomes de propriedades C# (PascalCase).
+            const novoRegistro = {
+                CEP: cep,
+                Cidade: cidade,
+                Estado: estado,
+                ReducaoCO2TotalKg: reducaoCO2,
+                EconomiaCombustivelTotalLitros: economiaCombustivel,
+                NumeroSubstituicoes: numeroSubstituicoes,
+                DataAnalise: new Date().toISOString()
+            };
 
             try {
-                const response = await fetch('/api/VeiculoSubstituicao', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
+                addRegistroBtn.disabled = true;
+                addRegistroBtn.textContent = "Registrando na API...";
+
+                await addRegistroToDb(novoRegistro);
+                await initializeApp(); // Recarrega os dados da API
+
+                clearForm();
+                displayStatus("Registro de Impacto criado com sucesso!", 'green');
+            } catch (error) {
+                console.error("Erro ao adicionar registro:", error);
+                displayStatus(error.message, 'red');
+            } finally {
+                addRegistroBtn.disabled = false;
+                addRegistroBtn.textContent = "Registrar Impacto";
+            }
+        }
+
+        /**
+         * Remove um registro.
+         */
+        async function deleteRegistro(registroId) {
+            try {
+                // Simulação de confirmação, pois o window.confirm não funciona no iFrame.
+                console.log(`Excluindo registro de impacto ID ${registroId}. (Confirmação simulada)`);
+
+                await deleteRegistroFromDb(registroId);
+                await initializeApp(); // Recarrega os dados da API
+                displayStatus("Registro de impacto removido com sucesso.", 'green');
+            } catch (error) {
+                console.error("Erro ao deletar registro:", error);
+                displayStatus(`Erro ao deletar registro: ${error.message}`, 'red');
+            }
+        }
+
+        // --- FUNÇÕES DE RENDERIZAÇÃO DA UI ---
+
+        /**
+         * Renderiza a lista de registros no DOM.
+         */
+        function renderRegistros() {
+            registroList.innerHTML = '';
+
+            if (registros.length === 0) {
+                registroList.innerHTML = `
+                            <p class="text-gray-500 text-center p-8 bg-white rounded-xl shadow-md">
+                                Nenhum registro de impacto encontrado. Adicione a primeira análise ou verifique a conexão com a API.
+                            </p>
+                        `;
+                return;
+            }
+
+            // Ordena: Pela DataAnalise, do mais recente para o mais antigo.
+            const sortedRegistros = [...registros].sort((a, b) =>
+                new Date(b.DataAnalise) - new Date(a.DataAnalise)
+            );
+
+            sortedRegistros.forEach(registro => {
+                const registroElement = document.createElement('div');
+
+                const co2Formatted = registro.ReducaoCO2TotalKg ? registro.ReducaoCO2TotalKg.toFixed(2) : '0.00';
+                const combustivelFormatted = registro.EconomiaCombustivelTotalLitros ? registro.EconomiaCombustivelTotalLitros.toFixed(2) : '0.00';
+                const dataAnalise = new Date(registro.DataAnalise).toLocaleDateString('pt-BR', { dateStyle: 'short' });
+
+                registroElement.className = `registro-card bg-white p-5 rounded-xl border-l-4 border-blue-500 shadow-md`;
+                registroElement.setAttribute('data-id', registro.Id);
+
+                registroElement.innerHTML = `
+                            <div class="flex justify-between items-start mb-3 border-b pb-2">
+                                <div class="text-lg font-bold text-gray-800 flex flex-col sm:flex-row sm:items-center">
+                                    <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded mr-2 mb-1 sm:mb-0 whitespace-nowrap">
+                                        ${registro.Cidade} - ${registro.Estado}
+                                    </span>
+                                    <span class="text-sm font-normal text-gray-500">${dataAnalise}</span>
+                                </div>
+
+                                <!-- Botão de Excluir -->
+                                <button class="delete-btn text-red-500 hover:text-red-700 p-1 rounded-full transition duration-150" aria-label="Excluir registro" data-id="${registro.Id}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- Métricas -->
+                            <div class="grid grid-cols-3 gap-4 text-center">
+                                <div>
+                                    <p class="text-2xl font-extrabold text-primary-dark">${co2Formatted}</p>
+                                    <p class="text-xs text-gray-500">Redução CO2 (Kg)</p>
+                                </div>
+                                <div class="border-l border-r border-gray-200">
+                                    <p class="text-2xl font-extrabold text-primary-dark">${combustivelFormatted}</p>
+                                    <p class="text-xs text-gray-500">Economia Comb. (L)</p>
+                                </div>
+                                <div>
+                                    <p class="text-2xl font-extrabold text-primary-dark">${registro.NumeroSubstituicoes}</p>
+                                    <p class="text-xs text-gray-500">Substituições</p>
+                                </div>
+                            </div>
+                            <p class="mt-3 text-right text-xs text-gray-400">ID: ${registro.Id} - CEP: ${registro.CEP}</p>
+                        `;
+
+                // Adiciona listener para o botão de Excluir
+                registroElement.querySelector('.delete-btn').addEventListener('click', () => {
+                    deleteRegistro(registro.Id);
                 });
 
-                const resultBox = document.getElementById('registroResult');
-                const errorBox = document.getElementById('registroError');
-                errorBox.textContent = '';
+                registroList.appendChild(registroElement);
+            });
+        }
 
-                if (response.ok) {
-                    const result = await response.json();
-                    resultBox.innerHTML = `
-                            <h3>Substituição registrada com sucesso!</h3>
-                            <p><strong>ID da Substituição:</strong> ${result.id}</p>
-                            <p><strong>Redução Estimada de CO2:</strong> ${result.reducaoCO2Estimada ? result.reducaoCO2Estimada.toFixed(2).replace('.', ',') : '0,00'} kg</p>
-                            <p><strong>Economia Estimada de Combustível:</strong> ${result.economiaCombustivelEstimada ? result.economiaCombustivelEstimada.toFixed(2).replace('.', ',') : '0,00'} litros</p>
-                            <p>Os dados completos do registro estão no console (JSON).</p>
-                        `;
-                    console.log('Dados do registro:', result);
-                    form.reset();
-                } else {
-                    const error = await response.json();
-                    let errorMessage = `Erro ${response.status}: ${response.statusText}\n`;
-                    if (error.errors) {
-                        for (const key in error.errors) {
-                            errorMessage += `• ${key}: ${error.errors[key].join(', ')}\n`;
-                        }
-                    } else if (error.detail) {
-                        errorMessage += error.detail;
-                    } else if (typeof error === 'string') {
-                        errorMessage += error;
-                    } else {
-                        errorMessage += JSON.stringify(error, null, 2);
-                    }
-                    errorBox.textContent = errorMessage;
-                    resultBox.innerHTML = '';
-                }
-            } catch (error) {
-                document.getElementById('registroError').textContent = 'Erro de rede ou ao processar a resposta: ' + error.message;
-                document.getElementById('registroResult').innerHTML = '';
-            }
-        });
+        /**
+         * Função de inicialização: carrega dados da API e renderiza.
+         */
+        async function initializeApp() {
+            // Garante que apenas a tela inicial de registro seja visível no início
+            changeView('register-view');
+
+            const fetchedRegistros = await fetchRegistros();
+            registros = fetchedRegistros;
+            renderRegistros();
+        }
+
+        // --- EVENT LISTENERS GLOBAIS ---
+
+        // Listener para o envio do formulário
+        registroForm.addEventListener('submit', addRegistro);
+
+        // Inicia a aplicação
+        window.onload = initializeApp;
+
     </script>
 </body>
 </html>

@@ -1,41 +1,63 @@
+﻿version: '3.8' # Adicionado o requisito de sintaxe
 
 services:
   veiculoverde-api:
     build:
       context: .
+      # Garante que o Dockerfile na raiz seja usado para o build
       dockerfile: Dockerfile
-    container_name: veiculoverde-api
     ports:
-      - "80:8080"
-      - "443:8081"
+      # Mapeia 8080 da máquina local para 8080 no contêiner
+      - "8080:8080"
     depends_on:
-      - db
+      - db # Garante que o banco suba antes da API
     environment:
+      # Variáveis de ambiente da API
       - ASPNETCORE_ENVIRONMENT=Development
+      # String de conexão usando o nome do serviço 'db' como host
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=esg_cidades;Username=esguser;Password=esgpassword
-      - ASPNETCORE_URLS=http://+:8080;https://+:8081
+      - ASPNETCORE_URLS=http://+:8080
     networks:
       - esg_network
 
   db:
     image: postgres:14-alpine
-    container_name: esg-db
+    container_name: veiculoverde-local-db # Adicionando nome para facilitar o gerenciamento
     restart: always
     environment:
+      # Variáveis para configurar o banco de dados Postgres
       - POSTGRES_USER=esguser
       - POSTGRES_PASSWORD=esgpassword
       - POSTGRES_DB=esg_cidades
     ports:
+      # Porta do banco exposta (Opcional, mas útil para acesso local)
       - "5432:5432"
     volumes:
+      # Volume para persistir os dados do banco
       - esg_db_data:/var/lib/postgresql/data/
     networks:
       - esg_network
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: veiculoverde-local-pgadmin # Adicionando nome para facilitar o gerenciamento
+    restart: always
+    environment:
+      # Credenciais de acesso ao PGAdmin
+      - PGADMIN_DEFAULT_EMAIL=admin@meudominio.com
+      - PGADMIN_DEFAULT_PASSWORD=suaSenha123
+    ports:
+      # Mapeia 8085 da máquina local para a porta web do PGAdmin
+      - "8085:80"
+    networks:
+      - esg_network
+
 networks:
+  # Rede interna para comunicação entre API, DB e PGAdmin
   esg_network:
     driver: bridge
 
 volumes:
+  # Definição do volume para persistência de dados
   esg_db_data:
     driver: local

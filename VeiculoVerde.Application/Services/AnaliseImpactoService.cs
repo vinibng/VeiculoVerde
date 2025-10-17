@@ -1,5 +1,4 @@
-﻿// VeiculoVerde.Application/Services/AnaliseImpactoService.cs
-using AutoMapper;
+﻿using AutoMapper;
 using VeiculoVerde.Application.DTOs;
 using VeiculoVerde.Application.Interfaces;
 using VeiculoVerde.Domain.Entities;
@@ -24,7 +23,8 @@ namespace VeiculoVerde.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<ImpactoAmbientalDTO> CalcularImpactoAmbientalPorRegiaoAsync(string cep, string cidade, string estado)
+        // ALTERADO O TIPO DE RETORNO para ImpactoAmbientalResponseDTO
+        public async Task<ImpactoAmbientalResponseDTO> CalcularImpactoAmbientalPorRegiaoAsync(string cep, string cidade, string estado)
         {
             // Busca todos os veículos substituídos na região
             var veiculosNaRegiao = await _veiculoRepository.FindAsync(v =>
@@ -35,26 +35,29 @@ namespace VeiculoVerde.Application.Services
 
             if (!veiculosNaRegiao.Any())
             {
+                // ALTERADO: Retorna null ou um objeto vazio se não houver veículos
                 return null;
             }
 
+            // CÁLCULOS AGREGADOS
             decimal reducaoCO2TotalKg = veiculosNaRegiao.Sum(v => v.EmissaoCO2Anterior - v.EmissaoCO2Nova);
             decimal economiaCombustivelTotalLitros = veiculosNaRegiao.Sum(v =>
             {
-                
+                // Lógica de cálculo de economia de combustível
                 if (v.TipoVeiculoSubstituto == TipoVeiculoSubstituto.BicicletaComum ||
                     v.TipoVeiculoSubstituto == TipoVeiculoSubstituto.BicicletaEletrica ||
                     v.TipoVeiculoSubstituto == TipoVeiculoSubstituto.CarroEletrico ||
                     v.TipoVeiculoSubstituto == TipoVeiculoSubstituto.MotoEletrica)
                 {
-                 
                     const decimal KM_ANUAL_PADRAO = 15000m;
-                    return (KM_ANUAL_PADRAO / v.ConsumoCombustivelAnteriorKmPorLitro);
+                    // Certifique-se de que ConsumoCombustivelAnteriorKmPorLitro não é zero
+                    return v.ConsumoCombustivelAnteriorKmPorLitro > 0 ? (KM_ANUAL_PADRAO / v.ConsumoCombustivelAnteriorKmPorLitro) : 0m;
                 }
-                return 0; 
+                return 0m;
             });
 
 
+            // BUSCA E ATUALIZA O REGISTRO DE IMPACTO
             var impactoExistente = (await _impactoRepository.FindAsync(i =>
                 (string.IsNullOrEmpty(cep) || i.CEP == cep) &&
                 (string.IsNullOrEmpty(cidade) || i.Cidade == cidade) &&
@@ -85,12 +88,20 @@ namespace VeiculoVerde.Application.Services
                 await _impactoRepository.UpdateAsync(impactoExistente);
             }
 
-            return _mapper.Map<ImpactoAmbientalDTO>(impactoExistente);
+            // Mapeia o Impacto (agregado)
+            var resultadoDto = _mapper.Map<ImpactoAmbientalResponseDTO>(impactoExistente);
+
+            // NOVO: Mapeia e anexa a lista detalhada de veículos ao DTO de Resposta
+            resultadoDto.VeiculosSubstituidos = _mapper.Map<IEnumerable<VeiculoSubstituidoResponseDTO>>(veiculosNaRegiao);
+
+            return resultadoDto;
         }
 
+        // MÉTODOS DE PAGINAÇÃO NÃO PRECISAM DE ALTERAÇÃO, MAS CERTIFIQUE-SE DE QUE ESTÃO 
+        // RETORNANDO A ImpactoAmbientalResponseDTO SE FOR USADO NA API DE LISTAGEM GERAL
         public async Task<PaginatedResultDTO<ImpactoAmbientalDTO>> GetImpactosAmbientaisPaginatedAsync(int pageNumber, int pageSize, string? cep = null, string? cidade = null, string? estado = null)
         {
-            var query = await _impactoRepository.GetAllAsync(); 
+            var query = await _impactoRepository.GetAllAsync();
 
             if (!string.IsNullOrEmpty(cep))
             {

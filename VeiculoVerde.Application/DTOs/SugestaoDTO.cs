@@ -1,5 +1,4 @@
-﻿// VeiculoVerde.Application/DTOs/SugestaoIncentivoDTO.cs
-namespace VeiculoVerde.Application.DTOs
+﻿namespace VeiculoVerde.Application.DTOs
 {
     public class SugestaoIncentivoDTO
     {

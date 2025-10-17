@@ -3,89 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sugestão de Incentivos</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Motivação Sustentável</title>
+    <!-- Carrega Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Define a fonte Inter e configura as cores para o tema de sustentabilidade -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Cores primárias de sustentabilidade
+                        'impact-green': '#10b981', // Verde vibrante
+                        'impact-blue': '#3b82f6',  // Azul de mobilidade
+                        'primary-dark': '#059669', // Verde mais escuro
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+        body {
+            background-color: #F0FDF4; /* Fundo muito claro e verde suave */
+            min-height: 100vh;
+        }
+
+        .shadow-primary {
+            /* Sombra suave com toque de verde */
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1), 0 4px 6px -4px rgba(16, 185, 129, 0.05);
+        }
+
+        .card-benefit {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+            .card-benefit:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+        /* Animação simples para o incentivo */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Sugestão de Incentivos</h1>
-        <form id="incentivosForm">
-            <div>
-                <label for="tipoVeiculoSugestao">Tipo Veículo Substituto (opcional):</label>
-                <select id="tipoVeiculoSugestao" name="tipoVeiculoSubstituto">
-                    <option value="">Todos</option>
-                    <option value="CarroEletrico">Carro Elétrico</option>
-                    <option value="MotoEletrica">Moto Elétrica</option>
-                    <option value="BicicletaEletrica">Bicicleta Elétrica</option>
-                    <option value="BicicletaComum">Bicicleta Comum</option>
-                </select>
-            </div>
-            <div>
-                <label for="estadoSugestao">Estado (UF, opcional):</label>
-                <input type="text" id="estadoSugestao" name="estado" maxlength="2" placeholder="Ex: SP">
-            </div>
-            <button type="submit">Buscar Incentivos</button>
-        </form>
+<body class="font-sans flex items-start justify-center p-4 md:p-8">
 
-        <div class="result-box" id="incentivosResult"></div>
-        <div class="error-message" id="incentivosError"></div>
+    <!-- Container Principal -->
+    <div id="app" class="w-full max-w-xl">
 
-        <p><a href="index.html">Voltar ao Dashboard</a></p>
+        <!-- Cabeçalho -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-gray-900 mb-2 md:text-5xl">
+                Mude para o Verde e Ganhe!
+            </h1>
+            <p class="text-lg text-impact-green font-medium">Seu incentivo diário para uma mobilidade sustentável.</p>
+        </header>
+
+        <!-- Área de Exibição do Incentivo/Motivação -->
+        <div class="bg-white p-6 rounded-xl shadow-primary mb-8 border border-impact-green/20">
+
+            <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Fato Sustentável do Dia</h2>
+
+            <!-- Exibição do Texto de Motivação -->
+            <div id="incentive-display" class="min-h-24 flex items-center justify-center text-center">
+                <p id="incentive-text" class="text-xl md:text-2xl font-semibold text-impact-blue italic transition duration-500">
+                    Clique abaixo e descubra por que vale a pena mudar!
+                </p>
+            </div>
+
+            <!-- Botão de Ação -->
+            <div class="mt-6">
+                <button id="get-incentive-btn"
+                        class="w-full bg-impact-green text-white p-4 rounded-lg font-bold text-lg
+                                hover:bg-impact-blue active:bg-primary-dark transition duration-200
+                                shadow-md shadow-impact-green/50 hover:shadow-impact-blue/50">
+                    Gerar Novo Incentivo
+                </button>
+            </div>
+        </div>
+
+        <!-- Lista de Benefícios Chave -->
+        <main>
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">Benefícios da Mobilidade Alternativa</h2>
+            <div id="benefits-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <!-- Benefício 1: Saúde Pessoal -->
+                <div class="card-benefit p-4 rounded-xl bg-white border border-impact-blue/20 shadow-sm">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl text-impact-blue">🚶‍♀️</span>
+                        <div>
+                            <p class="font-semibold text-gray-800">Melhora da Saúde</p>
+                            <p class="text-sm text-gray-600">Caminhar ou pedalar reduz o risco de doenças crônicas.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Benefício 2: Economia Financeira -->
+                <div class="card-benefit p-4 rounded-xl bg-white border border-impact-green/20 shadow-sm">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl text-impact-green">💰</span>
+                        <div>
+                            <p class="font-semibold text-gray-800">Economia Garantida</p>
+                            <p class="text-sm text-gray-600">Zero gasto com combustível, estacionamento ou manutenção pesada.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Benefício 3: Impacto Ambiental -->
+                <div class="card-benefit p-4 rounded-xl bg-white border border-impact-green/20 shadow-sm">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl text-impact-green">🌿</span>
+                        <div>
+                            <p class="font-semibold text-gray-800">Emissões Zero</p>
+                            <p class="text-sm text-gray-600">Contribuição direta para a redução de CO2 e poluição local.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Benefício 4: Qualidade de Vida Urbana -->
+                <div class="card-benefit p-4 rounded-xl bg-white border border-impact-blue/20 shadow-sm">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl text-impact-blue">🏙️</span>
+                        <div>
+                            <p class="font-semibold text-gray-800">Menos Estresse</p>
+                            <p class="text-sm text-gray-600">Menos trânsito, menos barulho e maior tranquilidade no dia a dia.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
     </div>
 
+    <!-- Script de Incentivo -->
     <script>
-        document.getElementById('incentivosForm').addEventListener('submit', async function (event) {
-            event.preventDefault();
-            const tipoVeiculoSubstituto = document.getElementById('tipoVeiculoSugestao').value;
-            const estado = document.getElementById('estadoSugestao').value;
+        const incentiveTextElement = document.getElementById('incentive-text');
+        const getIncentiveBtn = document.getElementById('get-incentive-btn');
 
-            const queryParams = new URLSearchParams();
-            if (tipoVeiculoSubstituto) queryParams.append('tipoVeiculoSubstituto', tipoVeiculoSubstituto);
-            if (estado) queryParams.append('estado', estado);
+        // Array de fatos e motivações sobre mobilidade sustentável
+        const sustainableIncentives = [
+            "Ao optar pela bicicleta, você economiza, em média, R$ 500 por mês em combustível e manutenção.",
+            "Uma viagem de 5 km de carro emite cerca de 1 kg de CO2. Se for de bicicleta ou a pé, a emissão é zero!",
+            "Caminhar ou pedalar por 30 minutos diários pode reduzir seu risco de doenças cardíacas em até 50%.",
+            "Muitas cidades oferecem benefícios fiscais ou descontos em estacionamentos para veículos elétricos e híbridos.",
+            "O Brasil tem investido em novas ciclovias e faixas exclusivas, tornando a mobilidade alternativa mais segura e rápida.",
+            "Um carro parado no trânsito gasta combustível e polui. Você, em sua alternativa, está economizando e respirando melhor.",
+            "Veículos elétricos têm custos de manutenção 40% menores, pois possuem menos peças móveis que se desgastam.",
+            "A cada 100 km rodados, um carro médio gasta cerca de 8 litros de gasolina. Imagine essa economia no final do ano!",
+            "Usar o transporte público ou carona reduz significativamente o número de carros nas ruas, diminuindo o congestionamento.",
+            "Se você usa patinete elétrico no seu trajeto, você contribui diretamente para a redução do ruído nas cidades."
+        ];
 
-            try {
-                const response = await fetch(`/api/Incentivos?${queryParams.toString()}`);
-                const resultBox = document.getElementById('incentivosResult');
-                const errorBox = document.getElementById('incentivosError');
-                errorBox.textContent = '';
+        /**
+         * Seleciona um incentivo aleatório e o exibe com uma animação suave.
+         */
+        function generateRandomIncentive() {
+            // Remove a classe de animação para resetar
+            incentiveTextElement.classList.remove('fade-in');
 
-                if (response.ok) {
-                    const result = await response.json();
+            // Força um reflow para garantir que a animação seja reiniciada
+            void incentiveTextElement.offsetWidth;
 
-                    resultBox.innerHTML = '';
+            const randomIndex = Math.floor(Math.random() * sustainableIncentives.length);
+            const incentive = sustainableIncentives[randomIndex];
 
-                    if (result.length > 0) {
-                        const heading = document.createElement('h2');
-                        heading.textContent = 'Incentivos Sugeridos:';
-                        resultBox.appendChild(heading);
+            incentiveTextElement.textContent = incentive;
 
-                        result.forEach(incentivo => {
-                            const incentiveDiv = document.createElement('div');
-                            incentiveDiv.className = 'incentive-item'; 
+            // Adiciona a classe de animação para iniciar
+            incentiveTextElement.classList.add('fade-in');
 
-                            incentiveDiv.innerHTML = `
-                                    <h3>${incentivo.tipoIncentivo || 'N/A'}</h3>
-                                    <p><strong>Descrição:</strong> ${incentivo.descricao || 'N/A'}</p>
-                                    <p><strong>Elegibilidade:</strong> ${incentivo.elegibilidade || 'N/A'}</p>
-                                    <p><strong>Valor Estimado do Benefício:</strong> R$ ${incentivo.valorEstimadoBeneficio ? incentivo.valorEstimadoBeneficio.toFixed(2).replace('.', ',') : '0,00'}</p>
-                                    ${incentivo.linkMaisInformacoes ? `<p><a href="${incentivo.linkMaisInformacoes}" target="_blank">Mais Informações</a></p>` : ''}
-                                `;
-                            resultBox.appendChild(incentiveDiv);
-                        });
-                    } else {
-                        resultBox.textContent = 'Nenhum incentivo encontrado para os critérios selecionados.';
-                    }
+        }
 
-                } else {
-                    const error = await response.json();
-                    errorBox.textContent = `Erro ${response.status}: ${response.statusText}\n` + (error.detail || JSON.stringify(error));
-                    resultBox.innerHTML = '';
-                }
-            } catch (error) {
-                document.getElementById('incentivosError').textContent = 'Erro de rede ou ao processar a resposta: ' + error.message;
-                document.getElementById('incentivosResult').innerHTML = '';
-            }
-        });
+        // Listener para o botão de geração de incentivo
+        getIncentiveBtn.addEventListener('click', generateRandomIncentive);
+
+        // Gera um incentivo inicial ao carregar a página
+        window.onload = generateRandomIncentive;
     </script>
 </body>
 </html>
