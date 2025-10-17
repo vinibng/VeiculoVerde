@@ -9,21 +9,19 @@ on:
       - main
 
 env:
-  # Variáveis de ambiente globais
   APP_NAME: VeiculoVerde.Api
   TEST_PROJECT_PATH: VeiculoVerde.Tests/VeiculoVerde.Tests.csproj
   DOCKER_IMAGE_NAME: veiculoverde-api
-  # Registro de Container do GitHub (GHCR)
   DOCKER_REGISTRY: ghcr.io/${{ github.repository_owner }}
   IMAGE_TAG: ${{ github.sha }}
-  
+
 jobs:
   # ==================================================
   # 1. BUILD, TESTE E PUSH DA IMAGEM
   # ==================================================
   build_test_and_push:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: 1. Checkout Código
       uses: actions/checkout@v4
@@ -32,47 +30,43 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
-        
+
     - name: 3. Restaurar dependências
-      # Usa o SLN para garantir que todas as dependências sejam restauradas
       run: dotnet restore
-        
+
     - name: 4. Build da Aplicação em Release
       run: dotnet build ${{ env.APP_NAME }}/${{ env.APP_NAME }}.csproj --no-restore --configuration Release
-    
+
     - name: 5. Rodar Testes Automatizados (MANDATÓRIO)
-      # Executa os testes. Se houver falha, o pipeline para aqui.
       run: dotnet test ${{ env.TEST_PROJECT_PATH }} --no-build --configuration Release
-      
-    # Só faz login e push da imagem se for um PUSH (não um Pull Request)
+
     - name: 6. Login no GitHub Container Registry (GHCR)
       if: github.event_name == 'push'
       uses: docker/login-action@v3
       with:
         registry: ${{ env.DOCKER_REGISTRY }}
         username: ${{ github.repository_owner }}
-        password: ${{ secrets.GITHUB_TOKEN }} # Token do GitHub para acesso ao registro
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: 7. Build e Push da Imagem Docker
       if: github.event_name == 'push'
+      id: docker_build
       uses: docker/build-push-action@v5
       with:
-        context: . # Usa o contexto do diretório raiz
+        context: .
         push: true
-        # Define o arquivo Dockerfile
         file: Dockerfile
-        # Tags de versão: SHA (única) e latest (última principal)
         tags: |
           ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-        # Passa o SHA (tag única) para ser usado pelos jobs de deploy
-        outputs:
-          image-tag: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-    
-    # Define a saída do job para uso nos jobs subsequentes (Deployment)
-    outputs:
-      image_full_tag: ${{ steps.7.outputs.image-tag }}
 
+    - name: 8. Definir saída da imagem
+      if: github.event_name == 'push'
+      id: set_output
+      run: echo "image_full_tag=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
+
+    outputs:
+      image_full_tag: ${{ steps.set_output.outputs.image_full_tag }}
 
   # ==================================================
   # 2. DEPLOY PARA STAGING (Continuous Delivery)
@@ -82,10 +76,8 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
-      # Define o ambiente no GitHub para rastreabilidade
       name: Staging
-      # Não é necessário URL, mas é bom documentar
-      
+
     steps:
     - name: 1. Geração do Comando de Deploy para Staging
       run: |
@@ -96,15 +88,13 @@ jobs:
         echo ""
         echo "### Comando Manual para Deploy (Simulação de Operação)"
         echo "\`\`\`bash"
-        echo "echo 'FAÇA LOGIN NO SEU SERVIDOR DOCKER AQUI: docker login ghcr.io...'"
+        echo "docker login ghcr.io"
         echo "docker pull ${{ needs.build_test_and_push.outputs.image_full_tag }}"
         echo "docker tag ${{ needs.build_test_and_push.outputs.image_full_tag }} ${{ env.DOCKER_IMAGE_NAME }}:staging"
         echo "docker-compose -f docker-compose.staging.yml up -d --no-deps ${{ env.DOCKER_IMAGE_NAME }}"
         echo "\`\`\`"
         echo ""
-        echo "Este passo atesta que a aplicação está pronta para ser entregue."
         echo "::notice::Continuous Delivery para Staging concluído. Imagem: ${{ needs.build_test_and_push.outputs.image_full_tag }}"
-
 
   # ==================================================
   # 3. DEPLOY PARA PRODUCTION (Requer Aprovação Manual)
@@ -114,9 +104,8 @@ jobs:
     if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
-      # Define o ambiente 'Production' e ADICIONA a regra de aprovação manual no GitHub
-      name: Production
-      
+      name: Production  # ❗ Certifique-se de que este ambiente está criado no GitHub e tem aprovação manual ativada
+
     steps:
     - name: 1. Geração do Comando de Deploy para Production
       run: |
@@ -127,11 +116,10 @@ jobs:
         echo ""
         echo "### Comando Manual para Deploy (Simulação de Operação)"
         echo "\`\`\`bash"
-        echo "echo 'FAÇA LOGIN NO SEU SERVIDOR DOCKER AQUI: docker login ghcr.io...'"
+        echo "docker login ghcr.io"
         echo "docker pull ${{ needs.build_test_and_push.outputs.image_full_tag }}"
         echo "docker tag ${{ needs.build_test_and_push.outputs.image_full_tag }} ${{ env.DOCKER_IMAGE_NAME }}:production"
         echo "docker-compose -f docker-compose.prod.yml up -d --no-deps ${{ env.DOCKER_IMAGE_NAME }}"
         echo "\`\`\`"
         echo ""
-        echo "O ciclo de vida CI/CD está completo e o artefato foi entregue."
         echo "::notice::Continuous Delivery para Production concluído. Imagem: ${{ needs.build_test_and_push.outputs.image_full_tag }}"

@@ -18,17 +18,14 @@ builder.Host.ConfigureLogging(logging =>
 
 
 // 1. Configurar CORS
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy =>
-                      {
-                          policy.AllowAnyOrigin()
-                                .AllowAnyHeader()
-                                .AllowAnyMethod();
-                      });
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
 });
 
 // CORREÇÃO ESSENCIAL PARA DATAS/POSTGRESQL (Npgsql)
@@ -120,7 +117,7 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 
 // 2. Usar o Middleware CORS 
-app.UseCors(MyAllowSpecificOrigins);
+app.UseCors("AllowAll");
 
 app.UseStaticFiles();
 app.UseAuthorization();
