@@ -37,8 +37,9 @@ jobs:
     - name: 4. Build da Aplicação em Release
       run: dotnet build ${{ env.APP_NAME }}/${{ env.APP_NAME }}.csproj --no-restore --configuration Release
 
-    - name: 5. Rodar Testes Automatizados (MANDATÓRIO)
-      run: dotnet test ${{ env.TEST_PROJECT_PATH }} --no-build --configuration Release
+    - name: Rodar Testes Automatizados (MANDATÓRIO)
+      run: dotnet test VeiculoVerde.Tests/VeiculoVerde.Tests.csproj --no-build --configuration Release
+
 
     - name: 6. Login no GitHub Container Registry (GHCR)
       if: github.event_name == 'push'
